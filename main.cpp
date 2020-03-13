@@ -3,6 +3,7 @@
 #include <vector>
 #include <stdio.h>
 #include <algorithm>
+#include <stdlib.h>
 using namespace std;
 
 #define INT(n) int n;scanf("%d", &n);
@@ -11,14 +12,12 @@ using namespace std;
 
 int main() {
     INT(t)
-    int as[100005];
+    int as[200005];
     FOR(cas, t) {
         INT(n)
-        INTs(as, n)
-        sort(as, as+n);
-        if ((n & 1) > 0) {
-            
-        } 
+        INTs(as, 2*n)
+        sort(as, as+2*n);
+        printf("%d\n", abs(as[n-1]-as[n]));
     }
     return 0;
 }
