@@ -1,1 +1,1 @@
-c++ main.cpp; if [ $? -eq 0 ]; then ./a.out; fi;
+c++ -std=c++14 main.cpp; if [ $? -eq 0 ]; then ./a.out; fi;
