@@ -8,6 +8,7 @@
 #include <cstring>
 using namespace std;
 
+#define N(n) n+20
 #define LL long long
 #define INT(n) int n;scanf("%d", &n);
 #define INTs(xs, n) for(int i = 0; i < n; i++) scanf("%d", &xs[i]);
@@ -18,15 +19,5 @@ using namespace std;
 #define RESET(xs, n, v) for(int i = 0; i < n; i++) xs[i] = v;
 
 int main() {
-    INT(n)
-    int bs[200006], xs[200006];
-    INTs(bs, n)
-    FOR(i, n) xs[i] = bs[i]-i;
-    map<int, LL> m;
-    m[xs[0]] = bs[0];
-    FOR1(i, 1, n) m[xs[i]] += bs[i];
-    LL ret = 0;
-    FORMAP(m, it) ret = max(ret, it->second);
-    printf("%lld\n", ret);
     return 0;
 }
