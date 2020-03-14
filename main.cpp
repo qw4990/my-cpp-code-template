@@ -7,20 +7,24 @@
 #include <map>
 #include <set>
 #include <cstring>
+#include <queue>
 using namespace std;
 
 #define MAXN 500005
 #define LL long long
 #define INT(n) int n;scanf("%d", &n);
 #define FOR(i, n) for(int i = 0; i < n; i ++)
-#define FORBE(i, b, e) for(int i = b; i < e; i++)
-#define FORIT(begin, end) for(auto it = begin; it != end; it++)
+#define FOR_BE(i, b, e) for(int i = b; i < e; i++)
+#define FOR_IT(begin, end) for(auto it = begin; it != end; it++)
 #define COPY(dst, src, n) for(int i = 0; i < n; i++) {*dst=*src;dst++;src++;}
-#define RESET(xs, n, v) for(int i = 0; i < n; i++) xs[i] = v;
-#define SCANF_VEC(T, vs, n) vector<T> vs(n); for(int i = 0; i < n; i++) cin >> vs[i];
-#define PRINT_VEC(vs) for(auto it=vs.begin(); it != vs.end(); it++) cout << *it << " "; cout << endl;
-#define PRINTBE(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
+#define RESET(begin, end, v) for(auto it = begin; it != end; it++) *it=v;
+#define VEC vector
+#define INPUT_VEC(T, vs, n) vector<T> vs(n); for(int i = 0; i < n; i++) cin >> vs[i];
+#define OUTPUT_VEC(vs) for(auto it=vs.begin(); it != vs.end(); it++) cout << *it << " "; cout << endl;
+#define OUTPUT_BE(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
 #define PII pair<int, int>
+#define FUNCTOR(name, ret, args, body) struct name {ret operator() args body};
+#define PQ priority_queue
 
 #define LS(k) (k*2)
 #define RS(k) (k*2+1)
@@ -120,6 +124,42 @@ public:
     }
 };
 
+FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
+FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
+
 int main() {
+    INT(n)
+    INPUT_VEC(int, as, n)
+    INPUT_VEC(int, ts, n)
+    VEC<PII> vs(n);
+    FOR(i, n) {
+        vs[i].first = as[i];
+        vs[i].second = ts[i];
+    }
+    sort(vs.begin(), vs.end(), pii_first());
+    
+    LL sum = 0, result = 0;
+    PQ<PII, VEC<PII>, pii_second> pq;
+
+    int cur = 0, i = 0;
+    while (true) {
+        cur++;
+        result += sum;
+
+        while (i < n && vs[i].first == cur) {
+            pq.push(vs[i]);
+            sum += vs[i].second;
+            i++;
+        }
+        if (i >= n && sum == 0) {
+            break;
+        } else if (i < n && sum == 0) {
+            cur = vs[i].first - 1;
+        } else {
+            sum -= pq.top().second;
+            pq.pop();
+        }
+    }
+    cout << result << endl;
     return 0;
 }
