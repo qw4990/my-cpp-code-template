@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <map>
+#include <set>
 #include <cstring>
 using namespace std;
 
@@ -14,12 +15,12 @@ using namespace std;
 #define INT(n) int n;scanf("%d", &n);
 #define INTs(xs, n) for(int i = 0; i < n; i++) scanf("%d", &xs[i]);
 #define FOR(i, n) for(int i = 0; i < n; i ++)
-#define FOR1(i, b, e) for(int i = b; i < e; i++)
-#define FORMAP(m, it) for(auto it = m.begin(); it != m.end(); it++)
-#define COPY(dst, src, n) memcpy(dst, src, sizeof((dst)[0])*n);
+#define FORBE(i, b, e) for(int i = b; i < e; i++)
+#define FORIT(begin, end) for(auto it = begin; it != end; it++)
+#define COPY(dst, src, n) for(int i = 0; i < n; i++) {*dst=*src;dst++;src++;}
 #define RESET(xs, n, v) for(int i = 0; i < n; i++) xs[i] = v;
-#define PRTARRAY(xs, b, e) for(int i = b; i < e; i++) cout << xs[i] << " "; cout << endl;
-
+#define PRINTLN(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
+#define PII pair<int, int>
 
 #define LS(k) (k*2)
 #define RS(k) (k*2+1)
@@ -120,53 +121,5 @@ public:
 };
 
 int main() {
-    LL l2r[MAXN];
-    LL r2l[MAXN];
-    int results[MAXN];
-    int ms[MAXN];
-
-    INT(n)
-    FOR1(i, 1, n+1) scanf("%d", &ms[i]);
-    SegmentTree st(n);
-
-    st.Build(1, 1, n, 0);
-    st.Set(1, 1, 1, ms[1]);
-    l2r[1] = ms[1];
-    FOR1(i, 2, n+1) {
-        int lim = st.LowerBound(1, 1, i-1, ms[i]);
-        st.Set(1, lim, i, ms[i]);
-        l2r[i] = st.Sum(1, 1, i);
-    }
-
-    reverse(ms+1, ms+1+n);
-    st.Build(1, 1, n, 0);
-    st.Set(1, 1, 1, ms[1]);
-    r2l[1] = ms[1];
-    FOR1(i, 2, n+1) {
-        int lim = st.LowerBound(1, 1, i-1, ms[i]);
-        st.Set(1, lim, i, ms[i]);
-        r2l[i] = st.Sum(1, 1, i);
-    }
-    reverse(r2l+1, r2l+1+n);
-    reverse(ms+1, ms+1+n);
-
-
-    LL result = 0;
-    int max_idx = 0;
-    FOR1(i, 1, n+1) {
-        if (l2r[i] + r2l[i] - ms[i] > result) {
-            result = l2r[i] + r2l[i] - ms[i];
-            max_idx = i;
-        }
-    }
-
-    results[max_idx] = ms[max_idx];
-    FOR1(i, max_idx+1, n+1) {
-        results[i] = min(results[i-1], ms[i]);
-    }
-    for (int i = max_idx-1; i >= 1; i--) {
-        results[i] = min(results[i+1], ms[i]);
-    }
-    PRTARRAY(results, 1, n+1);
     return 0;
 }
