@@ -10,16 +10,16 @@
 using namespace std;
 
 #define MAXN 500005
-#define N(n) n+20
 #define LL long long
 #define INT(n) int n;scanf("%d", &n);
-#define INTs(xs, n) for(int i = 0; i < n; i++) scanf("%d", &xs[i]);
 #define FOR(i, n) for(int i = 0; i < n; i ++)
 #define FORBE(i, b, e) for(int i = b; i < e; i++)
 #define FORIT(begin, end) for(auto it = begin; it != end; it++)
 #define COPY(dst, src, n) for(int i = 0; i < n; i++) {*dst=*src;dst++;src++;}
 #define RESET(xs, n, v) for(int i = 0; i < n; i++) xs[i] = v;
-#define PRINTLN(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
+#define SCANF_VEC(T, vs, n) vector<T> vs(n); for(int i = 0; i < n; i++) cin >> vs[i];
+#define PRINT_VEC(vs) for(auto it=vs.begin(); it != vs.end(); it++) cout << *it << " "; cout << endl;
+#define PRINTBE(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
 #define PII pair<int, int>
 
 #define LS(k) (k*2)
