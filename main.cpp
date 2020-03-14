@@ -127,39 +127,77 @@ public:
 FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
 
+void bfs(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
+    queue<int> q;
+    VEC<bool> vis(n+1, false);
+    vis[begin] = true;
+    dis[begin] = 0;
+    q.push(begin);
+    while (q.size() > 0) {
+        int p = q.front();
+        q.pop();
+        auto es = edges[p];
+        FOR(i, es.size()) {
+            int to = es[i];
+            if (vis[to]) {
+                continue;
+            }
+            vis[to] = true;
+            dis[to] = dis[p] + 1;
+            q.push(to);
+        }
+    }
+}
+
 int main() {
     INT(n)
-    INPUT_VEC(int, as, n)
-    INPUT_VEC(int, ts, n)
-    VEC<PII> vs(n);
-    FOR(i, n) {
-        vs[i].first = as[i];
-        vs[i].second = ts[i];
+    INT(m)
+    INT(k)
+    INPUT_VEC(int, sps, k)
+    VEC<VEC<int>> edges(n+1);
+    FOR(i, m) {
+        INT(x)
+        INT(y)
+        edges[x].push_back(y);
+        edges[y].push_back(x);
     }
-    sort(vs.begin(), vs.end(), pii_first());
+
+    VEC<int> to1(n+1, n*2);
+    VEC<int> ton(n+1, n*2);
+    bfs(n, 1, to1, edges);
+    bfs(n, n, ton, edges);
+
+    int best = n * 2;
+    FOR_BE(i, 1, n+1) 
+        best = min(best, to1[i] + ton[i]);
     
-    LL sum = 0, result = 0;
-    PQ<PII, VEC<PII>, pii_second> pq;
-
-    int cur = 0, i = 0;
-    while (true) {
-        cur++;
-        result += sum;
-
-        while (i < n && vs[i].first == cur) {
-            pq.push(vs[i]);
-            sum += vs[i].second;
-            i++;
-        }
-        if (i >= n && sum == 0) {
-            break;
-        } else if (i < n && sum == 0) {
-            cur = vs[i].first - 1;
-        } else {
-            sum -= pq.top().second;
-            pq.pop();
-        }
+    VEC<PII> xs;
+    FOR(i, sps.size()) {
+        int id = sps[i];
+        xs.push_back(PII(to1[id]-ton[id], id));
     }
-    cout << result << endl;
+    sort(xs.begin(), xs.end(), pii_first());
+    VEC<int> maxs(k);
+    maxs[k-1] = ton[xs[k-1].second];
+    for (int i = k-2; i >= 0; i--) 
+        maxs[i] = max(maxs[i+1], ton[xs[i].second]);
+    int best_ton = -1;
+    FOR_BE(i, 0, k-1)
+        best_ton = max(best_ton, to1[xs[i].second] + maxs[i+1] + 1);
+
+    xs.clear();
+    FOR(i, sps.size()) {
+        int id = sps[i];
+        xs.push_back(PII(ton[id]-to1[id], id));
+    }
+    sort(xs.begin(), xs.end(), pii_first());
+    maxs[k-1] = to1[xs[k-1].second];
+    for (int i = k-2; i >= 0; i--) 
+        maxs[i] = max(maxs[i+1], to1[xs[i].second]);
+    int best_to1 = -1;
+    FOR_BE(i, 0, k-1)
+        best_to1 = max(best_to1, ton[xs[i].second] + maxs[i+1] + 1);
+    
+    cout << min(best_to1, min(best_ton, best)) << endl;
     return 0;
 }
