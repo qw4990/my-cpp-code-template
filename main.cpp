@@ -16,6 +16,7 @@ using namespace std;
 #define FOR_BE(i, b, e) for(int i = b; i < e; i++)
 #define FOR_IT(begin, end) for(auto it = begin; it != end; it++)
 #define FOREACH(x, xs) for(auto x : xs)
+#define FORCASE() int _t_; cin >> _t_; for(int _i_ = 0; _i_ < _t_; _i_++)
 #define COPY(dst, src, n) for(int i = 0; i < n; i++) {*dst=*src;dst++;src++;}
 #define RESET(begin, end, v) for(auto it = begin; it != end; it++) *it=v;
 #define VEC vector
