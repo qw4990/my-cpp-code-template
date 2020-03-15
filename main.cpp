@@ -149,52 +149,10 @@ void bfs(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
     }
 }
 
-int n;
-VEC<int> as;
-VEC<VEC<int>> egs;
-VEC<int> best;
-
-void dfs1(int nd, int fa) {
-    if (as[nd] == 1) best[nd] = 1;
-    else best[nd] = -1;
-    FOREACH(to, egs[nd]) {
-        if (to == fa) continue;
-        dfs1(to, nd);
-        if (best[to] > 0) best[nd] += best[to];
-    }
-}
-
-void dfs2(int nd, int fa) {
-    FOREACH(to, egs[nd]) {
-        if (to == fa) continue;
-        if (best[to] >= 0) {
-            best[to] = max(best[to], best[nd]);
-        } else {
-            best[to] = max(best[to], best[to] + best[nd]);
-        }
-        dfs2(to, nd);
-    }
-}
+// ##################################################################
+// ########################### CODE BELOW ###########################
+// ##################################################################
 
 int main() {
-    cin >> n;
-    INPUT_VEC(as, n)
-    egs.resize(n);
-    FOR(i, n-1) {
-        int u, v;
-        cin >> u >> v;
-        u--;
-        v--;
-        egs[u].push_back(v);
-        egs[v].push_back(u);
-    }
-
-    best.resize(n);
-    dfs1(0, -1);
-    // OUTPUT_VEC(best)
-    dfs2(0, -1);
-    FOR(i, n) cout << best[i] << " ";
-    cout << endl;
-
     return 0;
 }
