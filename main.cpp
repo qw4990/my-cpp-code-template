@@ -12,9 +12,9 @@ using namespace std;
 
 #define MAXN 500005
 #define LL long long
-#define FOR(i, n) for(int i = 0; i < n; i ++)
-#define FOR_BE(i, b, e) for(int i = b; i < e; i++)
-#define FOR_IT(begin, end) for(auto it = begin; it != end; it++)
+#define REP(i, n) for(int i = 0; i < n; i ++)
+#define FOR(i, b, e) for(int i = b; i <= e; i++)
+#define FORIT(begin, end) for(auto it = begin; it != end; it++)
 #define FOREACH(x, xs) for(auto x : xs)
 #define FORCASE() int _t_; cin >> _t_; for(int _i_ = 0; _i_ < _t_; _i_++)
 #define COPY(dst, src, n) for(int i = 0; i < n; i++) {*dst=*src;dst++;src++;}
@@ -26,6 +26,12 @@ using namespace std;
 #define PII pair<int, int>
 #define FUNCTOR(name, ret, args, body) struct name {ret operator() args body};
 #define PQ priority_queue
+#define CLOCK_BEGIN() clock_t _clock_begin_ = clock();
+#define CLOCK_END() clock_t _clock_end_ = clock(); cout << "clock" << ": " << 1000*((double)(_clock_end_-_clock_begin_)/CLOCKS_PER_SEC) << "ms" << endl;
+
+// ##################################################################
+// ############################ 数据结构 ############################
+// ##################################################################
 
 #define LS(k) (k*2)
 #define RS(k) (k*2+1)
@@ -128,7 +134,11 @@ public:
 FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
 
-void bfs(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
+// ##################################################################
+// ############################## 其他 ##############################
+// ##################################################################
+
+void BasicBFS(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
     queue<int> q;
     VEC<bool> vis(n+1, false);
     vis[begin] = true;
@@ -138,7 +148,7 @@ void bfs(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
         int p = q.front();
         q.pop();
         auto es = edges[p];
-        FOR(i, es.size()) {
+        REP(i, es.size()) {
             int to = es[i];
             if (vis[to]) {
                 continue;
@@ -148,6 +158,56 @@ void bfs(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
             q.push(to);
         }
     }
+}
+
+// ##################################################################
+// ############################## 数论 ##############################
+// ##################################################################
+
+// 快速幂 (x^n)%mod
+LL FastMultiplyMod(LL x, LL n, LL mod) {
+    LL result = 1;
+    LL tmp = x;
+    while (n > 0) {
+        if (n & 1) result = (result * tmp) % mod;
+        tmp = (tmp * tmp) % mod;
+        n >>= 1;
+    }
+    return result;
+}
+
+// 求 a 对 mod 的逆元, mod 必须是素数
+// 用费马小定理, a^(mod-1) = 1(%mod), 则逆元为 a^(mod-2)
+// 计算方式为快速幂
+LL ModInverse(int a, LL mod) {
+    return FastMultiplyMod(a, mod-2, mod);
+}
+
+// C(a, b), a = 5, b = 2 ==> 10
+// 利用杨慧三角计算阶乘，并记忆化保存在 results 内
+LL FullCombinationMod(int a, int b, LL **results, LL mod) {
+    if (results != 0 && results[a][b] != -1) return results[a][b];
+    LL ret;
+    if (b == 0 || b == a) {
+        ret = 1 % mod;
+    } else {
+        ret = (FullCombinationMod(a-1, b, results, mod) + 
+        FullCombinationMod(a-1, b-1, results, mod)) % mod;
+    }
+    if (results != 0) results[a][b] = ret;
+    return ret;
+}
+
+// C(a, b), a = 5, b = 2 ==> 10
+// 计算方式为 a!/(b!*(a-b)!), 其中 factors 为对 mod 的阶乘
+LL CombinationModWithFactors(int a, int b, VEC<LL> &factors, LL mod) {
+    return (factors[a] * ModInverse((factors[b] * factors[a-b]) % mod, mod)) % mod;
+}
+
+void FillFactors(int n, VEC<LL> &factors, LL mod) {
+    factors.resize(n+1);
+    factors[1] = 1;
+    FOR(i, 2, n) factors[i] = (factors[i-1] * i) % mod;
 }
 
 // ##################################################################
