@@ -30,7 +30,7 @@ using namespace std;
 #define CLOCK_END() clock_t _clock_end_ = clock(); cout << "clock" << ": " << 1000*((double)(_clock_end_-_clock_begin_)/CLOCKS_PER_SEC) << "ms" << endl;
 
 // ##################################################################
-// ############################ 数据结构 ############################
+// ######################## data structures #########################
 // ##################################################################
 
 #define LS(k) (k*2)
@@ -135,7 +135,7 @@ FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
 
 // ##################################################################
-// ############################## 其他 ##############################
+// ############################# others #############################
 // ##################################################################
 
 void BasicBFS(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
@@ -161,10 +161,10 @@ void BasicBFS(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
 }
 
 // ##################################################################
-// ############################## 数论 ##############################
+// ######################### number theory ##########################
 // ##################################################################
 
-// 快速幂 (x^n)%mod
+// (x^n)%mod
 LL FastMultiplyMod(LL x, LL n, LL mod) {
     LL result = 1;
     LL tmp = x;
@@ -176,15 +176,15 @@ LL FastMultiplyMod(LL x, LL n, LL mod) {
     return result;
 }
 
-// 求 a 对 mod 的逆元, mod 必须是素数
-// 用费马小定理, a^(mod-1) = 1(%mod), 则逆元为 a^(mod-2)
-// 计算方式为快速幂
-LL ModInverse(int a, LL mod) {
-    return FastMultiplyMod(a, mod-2, mod);
+// a*result = 1(%mod), the mod must be a prime number
+// Fermat's little theorem: a%(prime-1) = 1(%prime) ==> the result is a^(prime-2)%prime
+LL ModInverse(int a, LL prime_mod) {
+    return FastMultiplyMod(a, prime_mod-2, prime_mod);
 }
 
 // C(a, b), a = 5, b = 2 ==> 10
-// 利用杨慧三角计算阶乘，并记忆化保存在 results 内
+// Calculate all combination numbers and store them in results.
+// Pascal's traingle: C(a, b) = C(a-1, b-1) + C(a-1, b), and then
 LL FullCombinationMod(int a, int b, LL **results, LL mod) {
     if (results != 0 && results[a][b] != -1) return results[a][b];
     LL ret;
@@ -199,15 +199,23 @@ LL FullCombinationMod(int a, int b, LL **results, LL mod) {
 }
 
 // C(a, b), a = 5, b = 2 ==> 10
-// 计算方式为 a!/(b!*(a-b)!), 其中 factors 为对 mod 的阶乘
+// C(a, b) = a!/(b!*(a-b)!)
 LL CombinationModWithFactors(int a, int b, VEC<LL> &factors, LL mod) {
     return (factors[a] * ModInverse((factors[b] * factors[a-b]) % mod, mod)) % mod;
 }
 
-void FillFactors(int n, VEC<LL> &factors, LL mod) {
-    factors.resize(n+1);
-    factors[1] = 1;
-    FOR(i, 2, n) factors[i] = (factors[i-1] * i) % mod;
+// Calculate 1!, 2!, ... n! and store them in the fac vector.
+void FillFactorial(int n, VEC<LL> &fac, LL mod) {
+    fac.resize(n+1);
+    fac[1] = 1;
+    FOR(i, 2, n) fac[i] = (fac[i-1] * i) % mod;
+}
+
+// Calculate the greatest common divisor.
+// gcd(a, b) = gcd(b, a%b).
+LL GCD(LL a, LL b) {
+    if (a % b == 0) return b;
+    return GCD(b, a%b);
 }
 
 // ##################################################################
