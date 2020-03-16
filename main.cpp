@@ -8,6 +8,8 @@
 #include <set>
 #include <cstring>
 #include <queue>
+#include <stack>
+#include <deque>
 using namespace std;
 
 #define MAXN 500005
@@ -205,7 +207,7 @@ LL CombinationModWithFactors(int a, int b, VEC<LL> &factors, LL mod) {
 }
 
 // Calculate 1!, 2!, ... n! and store them in the fac vector.
-void FillFactorial(int n, VEC<LL> &fac, LL mod) {
+void Factorial(int n, VEC<LL> &fac, LL mod) {
     fac.resize(n+1);
     fac[1] = 1;
     FOR(i, 2, n) fac[i] = (fac[i-1] * i) % mod;
@@ -223,14 +225,48 @@ LL GCD(LL a, LL b) {
 // ##################################################################
 
 int main() {
-    FORCASE() {
-        int n;
-        cin >> n;
-        VEC<int> as;
-        INPUT_VEC(as, n)
-        sort(as.begin(), as.end());
-        reverse(as.begin(), as.end());
-        OUTPUT_VEC(as)
+    int n;
+    cin >> n;
+    char str[1000006];
+    cin >> str;
+    int lcnt = 0, rcnt = 0;
+    REP(i, n) {
+        if (str[i] == '(') lcnt++;
+        else rcnt++;
     }
+    if (lcnt != rcnt) {
+        cout << -1 << endl;
+        return 0;
+    }
+
+
+    VEC<int> pairs(n, -1);
+    stack<int> st;
+    int count = 0;
+    REP(i, n) {
+        if (str[i] == '(') {
+            if (st.size() > 0) {
+                pairs[i] = st.top();
+                st.pop();
+            } else {
+                count++;
+            }
+        } else {
+            if (count > 0) count--;
+            else st.push(i);
+        }
+    }
+    // OUTPUT_VEC(pairs)
+
+    int sum = 0;
+    for (int i = n-1; i >= 0; ) {
+        int l = pairs[i];
+        if (l == -1) i--;
+        else {
+            sum += i-l+1;
+            i = l-1;
+        }
+    } 
+    cout << sum << endl;
     return 0;
 }
