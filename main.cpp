@@ -223,5 +223,14 @@ LL GCD(LL a, LL b) {
 // ##################################################################
 
 int main() {
+    FORCASE() {
+        int n;
+        cin >> n;
+        VEC<int> as;
+        INPUT_VEC(as, n)
+        sort(as.begin(), as.end());
+        reverse(as.begin(), as.end());
+        OUTPUT_VEC(as)
+    }
     return 0;
 }
