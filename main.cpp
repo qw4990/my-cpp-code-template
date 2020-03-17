@@ -22,6 +22,7 @@ using namespace std;
 #define COPY(dst, src, n) for(int i = 0; i < n; i++) {*dst=*src;dst++;src++;}
 #define RESET(begin, end, v) for(auto it = begin; it != end; it++) *it=v;
 #define VEC vector
+#define MATRIX(T, ma, n, m) vector<vector<T>> ma(n, vector<T>(m));
 #define INPUT_VEC(vs, n) vs.resize(n); for(int i = 0; i < n; i++) cin >> vs[i];
 #define OUTPUT_VEC(vs) for(auto it=vs.begin(); it != vs.end(); it++) cout << *it << " "; cout << endl;
 #define OUTPUT_BE(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
@@ -224,49 +225,88 @@ LL GCD(LL a, LL b) {
 // ########################### CODE BELOW ###########################
 // ##################################################################
 
+int n;
+MATRIX(PII, as, 1003, 1003)
+MATRIX(int, result, 1003, 1003)
+
+int dx[4] = {1, -1, 0, 0};
+int dy[4] = {0, 0, 1, -1};
+char dc[4] = {'D', 'U', 'R', 'L'};
+
 int main() {
-    int n;
     cin >> n;
-    char str[1000006];
-    cin >> str;
-    int lcnt = 0, rcnt = 0;
-    REP(i, n) {
-        if (str[i] == '(') lcnt++;
-        else rcnt++;
+    FOR(i, 1, n) FOR(j, 1, n) {
+        as[i][j] = PII(-2, -2);
+        result[i][j] = -2;
     }
-    if (lcnt != rcnt) {
-        cout << -1 << endl;
+    
+    REP(i, n) {
+        REP(j, n) {
+            int x, y;
+            cin >> x >> y;
+            as[i+1][j+1] = PII(x, y);
+        }
+    }
+
+    queue<PII> q;
+    FOR(i, 1, n) FOR(j, 1, n) {
+        if (as[i][j] == PII(i, j)) {
+            result[i][j] = -1;
+            q.push(PII(i, j));
+        }
+    }
+    while (q.size() > 0) {
+        auto cur = q.front();
+        // cout << " >> " << cur.first << " " << cur.second << endl;
+        q.pop();
+        int x = cur.first;
+        int y = cur.second;
+        REP(d, 4) {
+            int nx = x + dx[d];
+            int ny = y + dy[d];
+            if (nx <= 0 || nx > n || ny <= 0 || ny > n) continue;
+            // cout << "?> " << nx << " " << ny << " -->> " << (as[nx][ny] == as[x][y]) << endl;
+            // cout << " 1> " << as[nx][ny].first << " " << as[nx][ny].second << endl;
+            // cout << " 2> " << as[x][y].first << " " << as[x][y].second << endl;
+            if (result[nx][ny] == -2 && as[nx][ny] == as[x][y]) {
+                result[nx][ny] = d^1;
+                q.push(PII(nx, ny));
+            }
+        }
+    }
+
+    FOR(i, 1, n) FOR(j, 1, n) 
+        if (as[i][j] == PII(-1, -1)) {
+            REP(d, 4) {
+                int nx = i + dx[d];
+                int ny = j + dy[d];
+                if (nx <= 0 || nx > n || ny <= 0 || ny > n) continue;
+                if (as[nx][ny] == PII(-1, -1)) {
+                    result[i][j] = d;
+                }
+            }
+        }
+
+    bool invalid = false;
+    FOR(i, 1, n) FOR(j, 1, n) 
+        if (result[i][j] == -2) 
+            invalid = true;
+
+    if (invalid) {
+        cout << "INVALID" << endl;
         return 0;
     }
 
-
-    VEC<int> pairs(n, -1);
-    stack<int> st;
-    int count = 0;
-    REP(i, n) {
-        if (str[i] == '(') {
-            if (st.size() > 0) {
-                pairs[i] = st.top();
-                st.pop();
-            } else {
-                count++;
-            }
-        } else {
-            if (count > 0) count--;
-            else st.push(i);
+    cout << "VALID" << endl;
+    FOR(i, 1, n) {
+        FOR(j, 1, n) {
+            int r = result[i][j];
+            // cout << r ;
+            if (r == -1) cout << "X";
+            else cout << dc[r];
         }
+        cout << endl;
     }
-    // OUTPUT_VEC(pairs)
 
-    int sum = 0;
-    for (int i = n-1; i >= 0; ) {
-        int l = pairs[i];
-        if (l == -1) i--;
-        else {
-            sum += i-l+1;
-            i = l-1;
-        }
-    } 
-    cout << sum << endl;
     return 0;
 }
