@@ -222,91 +222,51 @@ LL GCD(LL a, LL b) {
 }
 
 // ##################################################################
+// ############################ strings ############################
+// ##################################################################
+
+// KMP
+
+// KMP Next
+
+// Manacher algorithm is used to calculate palindrome strings.
+// All int elements in the original str vectors should be larger than 0.
+// If the input str is "a b c c b c a", then the output are:
+//  manastr: ^ a # b # c # c # b # c # a # $
+//  manapal: 0 0 0 1 0 1 4 1 0 3 0 1 0 1 0 0
+void manacher(VEC<char> &str, VEC<char> &manastr, VEC<int> &manapal) {
+    // prepare
+    manastr.clear();
+    manastr.push_back('^');
+    FOREACH(x, str) {
+        manastr.push_back(x);
+        manastr.push_back('#');
+    }
+    manastr.push_back('$');
+    
+    // calculate manapal
+    int n = manastr.size();
+    manapal.resize(n);
+    int center = 0, right = 0;
+    FOR(i, 1, n-1) {
+        int i_mirror = 2 * center - i;
+        if (right > i) manapal[i] = min(right - i, manapal[i_mirror]);
+        else manapal[i] = 0;
+        
+        while (manastr[i + 1 + manapal[i]] == manastr[i - 1 - manapal[i]])
+            manapal[i]++;
+        
+        if (i + manapal[i] > right) {
+            center = i;
+            right = i + manapal[i];
+        }
+    }
+}
+
+// ##################################################################
 // ########################### CODE BELOW ###########################
 // ##################################################################
 
-int n;
-MATRIX(PII, as, 1003, 1003)
-MATRIX(int, result, 1003, 1003)
-
-int dx[4] = {1, -1, 0, 0};
-int dy[4] = {0, 0, 1, -1};
-char dc[4] = {'D', 'U', 'R', 'L'};
-
 int main() {
-    cin >> n;
-    FOR(i, 1, n) FOR(j, 1, n) {
-        as[i][j] = PII(-2, -2);
-        result[i][j] = -2;
-    }
-    
-    REP(i, n) {
-        REP(j, n) {
-            int x, y;
-            cin >> x >> y;
-            as[i+1][j+1] = PII(x, y);
-        }
-    }
-
-    queue<PII> q;
-    FOR(i, 1, n) FOR(j, 1, n) {
-        if (as[i][j] == PII(i, j)) {
-            result[i][j] = -1;
-            q.push(PII(i, j));
-        }
-    }
-    while (q.size() > 0) {
-        auto cur = q.front();
-        // cout << " >> " << cur.first << " " << cur.second << endl;
-        q.pop();
-        int x = cur.first;
-        int y = cur.second;
-        REP(d, 4) {
-            int nx = x + dx[d];
-            int ny = y + dy[d];
-            if (nx <= 0 || nx > n || ny <= 0 || ny > n) continue;
-            // cout << "?> " << nx << " " << ny << " -->> " << (as[nx][ny] == as[x][y]) << endl;
-            // cout << " 1> " << as[nx][ny].first << " " << as[nx][ny].second << endl;
-            // cout << " 2> " << as[x][y].first << " " << as[x][y].second << endl;
-            if (result[nx][ny] == -2 && as[nx][ny] == as[x][y]) {
-                result[nx][ny] = d^1;
-                q.push(PII(nx, ny));
-            }
-        }
-    }
-
-    FOR(i, 1, n) FOR(j, 1, n) 
-        if (as[i][j] == PII(-1, -1)) {
-            REP(d, 4) {
-                int nx = i + dx[d];
-                int ny = j + dy[d];
-                if (nx <= 0 || nx > n || ny <= 0 || ny > n) continue;
-                if (as[nx][ny] == PII(-1, -1)) {
-                    result[i][j] = d;
-                }
-            }
-        }
-
-    bool invalid = false;
-    FOR(i, 1, n) FOR(j, 1, n) 
-        if (result[i][j] == -2) 
-            invalid = true;
-
-    if (invalid) {
-        cout << "INVALID" << endl;
-        return 0;
-    }
-
-    cout << "VALID" << endl;
-    FOR(i, 1, n) {
-        FOR(j, 1, n) {
-            int r = result[i][j];
-            // cout << r ;
-            if (r == -1) cout << "X";
-            else cout << dc[r];
-        }
-        cout << endl;
-    }
-
     return 0;
 }
