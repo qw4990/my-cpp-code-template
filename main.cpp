@@ -11,6 +11,7 @@
 #include <stack>
 #include <deque>
 #include <list>
+#include <math.h>
 using namespace std;
 
 #define MAXN 500005
@@ -221,6 +222,19 @@ void Factorial(int n, VEC<LL> &fac, LL mod) {
 LL GCD(LL a, LL b) {
     if (a % b == 0) return b;
     return GCD(b, a%b);
+}
+// Factoring the x.
+// for example: 2484 = 2 * 2 * 3 * 3 * 3 * 23
+void Factoring(LL x, VEC<LL> &factors) {
+    LL prim = 2;
+    while (prim * prim <= x) {
+        while (x % prim == 0) {
+            factors.push_back(prim);
+            x /= prim;
+        }
+        prim ++;
+    }
+    if (x != 1) factors.push_back(x);
 }
 
 // ##################################################################
