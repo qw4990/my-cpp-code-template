@@ -10,6 +10,7 @@
 #include <queue>
 #include <stack>
 #include <deque>
+#include <list>
 using namespace std;
 
 #define MAXN 500005
@@ -27,6 +28,7 @@ using namespace std;
 #define OUTPUT_VEC(vs) for(auto it=vs.begin(); it != vs.end(); it++) cout << *it << " "; cout << endl;
 #define OUTPUT_BE(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
 #define PII pair<int, int>
+#define PLL pair<long long, long long>
 #define FUNCTOR(name, ret, args, body) struct name {ret operator() args body};
 #define PQ priority_queue
 #define CLOCK_BEGIN() clock_t _clock_begin_ = clock();
