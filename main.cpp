@@ -35,6 +35,10 @@ using namespace std;
 #define CLOCK_BEGIN() clock_t _clock_begin_ = clock();
 #define CLOCK_END() clock_t _clock_end_ = clock(); cout << "clock" << ": " << 1000*((double)(_clock_end_-_clock_begin_)/CLOCKS_PER_SEC) << "ms" << endl;
 
+
+FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
+FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
+
 // ##################################################################
 // ######################## data structures #########################
 // ##################################################################
@@ -137,9 +141,6 @@ public:
     }
 };
 
-FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
-FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
-
 // ##################################################################
 // ############################# others #############################
 // ##################################################################
@@ -170,7 +171,8 @@ void BasicBFS(int n, int begin, VEC<int> &dis, VEC<VEC<int>> &edges) {
 // ######################### number theory ##########################
 // ##################################################################
 
-// (x^n)%mod
+// calculate (x^n)%mod.
+// O(log(n))
 LL FastMultiplyMod(LL x, LL n, LL mod) {
     LL result = 1;
     LL tmp = x;
@@ -182,15 +184,17 @@ LL FastMultiplyMod(LL x, LL n, LL mod) {
     return result;
 }
 
-// a*result = 1(%mod), the mod must be a prime number
-// Fermat's little theorem: a%(prime-1) = 1(%prime) ==> the result is a^(prime-2)%prime
+// a*result = 1(%mod), the mod must be a prime number.
+// Fermat's little theorem: a%(prime-1) = 1(%prime) ==> the result is a^(prime-2)%prime.
+// O(log(prime_mod)).
 LL ModInverse(int a, LL prime_mod) {
     return FastMultiplyMod(a, prime_mod-2, prime_mod);
 }
 
-// C(a, b), a = 5, b = 2 ==> 10
+// C(a, b), a = 5, b = 2 ==> 10.
 // Calculate all combination numbers and store them in results.
-// Pascal's traingle: C(a, b) = C(a-1, b-1) + C(a-1, b), and then
+// Pascal's traingle: C(a, b) = C(a-1, b-1) + C(a-1, b).
+// O(a*b)
 LL FullCombinationMod(int a, int b, LL **results, LL mod) {
     if (results != 0 && results[a][b] != -1) return results[a][b];
     LL ret;
@@ -204,27 +208,32 @@ LL FullCombinationMod(int a, int b, LL **results, LL mod) {
     return ret;
 }
 
-// C(a, b), a = 5, b = 2 ==> 10
+// C(a, b), a = 5, b = 2 ==> 10, the mod number must be prime. 
 // C(a, b) = a!/(b!*(a-b)!)
-LL CombinationModWithFactors(int a, int b, VEC<LL> &factors, LL mod) {
-    return (factors[a] * ModInverse((factors[b] * factors[a-b]) % mod, mod)) % mod;
+// O(log(mod))
+LL CombinationModWithFactors(int a, int b, VEC<LL> &factors, LL prime_mod) {
+    return (factors[a] * ModInverse((factors[b] * factors[a-b]) % prime_mod, prime_mod)) % prime_mod;
 }
 
-// Calculate 1!, 2!, ... n! and store them in the fac vector.
+// Calculate 1!, 2!, ... n! and store them in the fac vector. 
+// O(n)
 void Factorial(int n, VEC<LL> &fac, LL mod) {
     fac.resize(n+1);
     fac[1] = 1;
     FOR(i, 2, n) fac[i] = (fac[i-1] * i) % mod;
 }
 
-// Calculate the greatest common divisor.
+// Calculate the greatest common divisor. 
 // gcd(a, b) = gcd(b, a%b).
+// O(log(min(a, b)))
 LL GCD(LL a, LL b) {
     if (a % b == 0) return b;
     return GCD(b, a%b);
 }
-// Factoring the x.
+
+// Factoring the x. 
 // for example: 2484 = 2 * 2 * 3 * 3 * 3 * 23
+// O(sqrt(x))
 void Factoring(LL x, VEC<LL> &factors) {
     LL prim = 2;
     while (prim * prim <= x) {
@@ -235,6 +244,15 @@ void Factoring(LL x, VEC<LL> &factors) {
         prim ++;
     }
     if (x != 1) factors.push_back(x);
+}
+
+// IsPrime tests if this number is a prime number.
+// O(sqrt(x))
+bool IsPrime(LL x) {
+    if (x <= 1) return false;
+    for (LL i = 2; i*i <= x; i++) 
+        if (x % i == 0) return false;
+    return true;
 }
 
 // ##################################################################

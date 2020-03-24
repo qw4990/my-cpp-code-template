@@ -10,6 +10,8 @@
 #include <queue>
 #include <stack>
 #include <deque>
+#include <list>
+#include <math.h>
 using namespace std;
 
 #define MAXN 500005
@@ -27,6 +29,7 @@ using namespace std;
 #define OUTPUT_VEC(vs) for(auto it=vs.begin(); it != vs.end(); it++) cout << *it << " "; cout << endl;
 #define OUTPUT_BE(begin, end) for(auto it = begin; it != end; it++) cout << *it << " "; cout << endl;
 #define PII pair<int, int>
+#define PLL pair<long long, long long>
 #define FUNCTOR(name, ret, args, body) struct name {ret operator() args body};
 #define PQ priority_queue
 #define CLOCK_BEGIN() clock_t _clock_begin_ = clock();
@@ -220,32 +223,140 @@ LL GCD(LL a, LL b) {
     if (a % b == 0) return b;
     return GCD(b, a%b);
 }
+// Factoring the x.
+// for example: 2484 = 2 * 2 * 3 * 3 * 3 * 23
+void Factoring(LL x, VEC<LL> &factors) {
+    LL prim = 2;
+    while (prim * prim <= x) {
+        while (x % prim == 0) {
+            factors.push_back(prim);
+            x /= prim;
+        }
+        prim ++;
+    }
+    if (x != 1) factors.push_back(x);
+}
+
+// ##################################################################
+// ############################ strings ############################
+// ##################################################################
+
+// Calculate the next vector used by KMP Algorithm.
+// str:  a b a b a b z a b a b a b a
+// next: 0 0 1 2 3 4 0 1 2 3 4 5 6 ?
+void kmpNext(VEC<char> &str, VEC<int> &next) {
+    int n = str.size();
+    next.resize(n-1);
+    next[0] = 0;
+    int max_len = 0;
+    FOR(i, 1, n-1) {
+        while (max_len > 0 && str[i] != str[max_len])
+            max_len = next[max_len - 1];
+        if (str[max_len] == str[i]) max_len++;
+        next[i] = max_len;
+    }
+}
+
+// The KMP Algorithm.
+// str:         a b a b a b z a b a b a b
+// substr:      a b a
+// position:    0   2         7   9
+void kmp(VEC<char> &str, VEC<char> &substr, VEC<int> &position) {
+    VEC<int> next;
+    kmpNext(substr, next);
+    position.clear();
+    int n = str.size(), max_len = 0;
+    REP(i, n) {
+        while (max_len > 0 && str[i] != substr[max_len])
+            max_len = next[max_len - 1];
+        if (str[i] == substr[max_len]) max_len ++;
+        if (max_len == substr.size()) {
+            position.push_back(i - substr.size() + 1);
+            max_len = next[max_len - 1];
+        }
+    }
+}
+
+// Manacher algorithm is used to calculate palindrome strings.
+// All int elements in the original str vectors should be larger than 0.
+// If the input str is "a b c c b c a", then the output are:
+//  manastr: ^ a # b # c # c # b # c # a # $
+//  manapal: 0 0 0 1 0 1 4 1 0 3 0 1 0 1 0 0
+void manacher(VEC<char> &str, VEC<char> &manastr, VEC<int> &manapal) {
+    // prepare
+    manastr.clear();
+    manastr.push_back('^');
+    FOREACH(x, str) {
+        manastr.push_back(x);
+        manastr.push_back('#');
+    }
+    manastr.push_back('$');
+    
+    // calculate manapal
+    int n = manastr.size();
+    manapal.resize(n);
+    int center = 0, right = 0;
+    FOR(i, 1, n-1) {
+        int i_mirror = 2 * center - i;
+        if (right > i) manapal[i] = min(right - i, manapal[i_mirror]);
+        else manapal[i] = 0;
+        
+        while (manastr[i + 1 + manapal[i]] == manastr[i - 1 - manapal[i]])
+            manapal[i]++;
+        
+        if (i + manapal[i] > right) {
+            center = i;
+            right = i + manapal[i];
+        }
+    }
+}
 
 // ##################################################################
 // ########################### CODE BELOW ###########################
 // ##################################################################
 
-int main() {
-    LL mod = 998244353;
-    LL n, k;
-    cin >> n >> k;
-    VEC<LL> ps(n);
-    INPUT_VEC(ps, n)
-    
-    LL sum = (2*n-k+1)*k/2;
-    LL lim = n-k;
-    LL count = 1;
-    int last = -1;
-    REP(i, n) 
-        if (ps[i] > lim) {
-            if (last == -1) {
-                last = i;
-                continue;
-            }
+VEC<bool> moving;
+VEC<PII> sp, fp;
+int n, m, k, move_cnt;
+VEC<char> cmds;
 
-            count = (count * (i - last)) % mod;
-            last = i;
-        }
-    cout << sum << " " << count << endl;
+void output() {
+    cout << cmds.size() << endl;
+    FOREACH(c, cmds) cout << c;
+    cout << endl;
+}
+
+int main() {
+    cin >> n >> m >> k;
+    move_cnt = k;
+    moving.resize(k, true);
+    
+    REP(i, k) {
+        int x, y;
+        cin >> x >> y;
+        sp.push_back(PII(x, y));
+    }
+    REP(i, k) {
+        int x, y;
+        cin >> x >> y;
+        fp.push_back(PII(x, y));
+    }
+
+    REP(i, m-1) cmds.push_back('L');
+    REP(i, n-1) cmds.push_back('U');
+
+    int r = 1;
+    char d = 'R';
+    while (true) {
+        REP(i, m-1) cmds.push_back(d);
+        if (r < n) {
+            cmds.push_back('D');
+            if (d == 'R') d = 'L';
+            else d = 'R';
+            r++;
+        } else break;
+    }
+
+    output();
     return 0;
 }
