@@ -3,7 +3,7 @@
 // Calculate the next vector used by KMP Algorithm.
 // str:  a b a b a b z a b a b a b a
 // next: 0 0 1 2 3 4 0 1 2 3 4 5 6 ?
-void KMPNext(VEC<char> &str, VEC<int> &next) {
+void kmp_next(VEC<char> &str, VEC<int> &next) {
     int n = str.size();
     next.resize(n-1);
     next[0] = 0;
@@ -20,9 +20,9 @@ void KMPNext(VEC<char> &str, VEC<int> &next) {
 // str:         a b a b a b z a b a b a b
 // substr:      a b a
 // position:    0   2         7   9
-void KMP(VEC<char> &str, VEC<char> &substr, VEC<int> &position) {
+void kmp(VEC<char> &str, VEC<char> &substr, VEC<int> &position) {
     VEC<int> next;
-    KMPNext(substr, next);
+    kmp_next(substr, next);
     position.clear();
     int n = str.size(), max_len = 0;
     REP(i, n) {
@@ -41,7 +41,7 @@ void KMP(VEC<char> &str, VEC<char> &substr, VEC<int> &position) {
 // If the input str is "a b c c b c a", then the output are:
 //  manastr: ^ a # b # c # c # b # c # a # $
 //  manapal: 0 0 0 1 0 1 4 1 0 3 0 1 0 1 0 0
-void Manacher(VEC<char> &str, VEC<char> &manastr, VEC<int> &manapal) {
+void manacher(VEC<char> &str, VEC<char> &manastr, VEC<int> &manapal) {
     // prepare
     manastr.clear();
     manastr.push_back('^');
