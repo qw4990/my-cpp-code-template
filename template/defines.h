@@ -35,7 +35,3 @@ using namespace std;
 #define PLL pair<long long, long long>
 FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
-
-int main() {
-    return 0;
-}
