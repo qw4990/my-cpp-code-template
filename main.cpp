@@ -36,23 +36,6 @@ using namespace std;
 FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
 
-
-    // template <typename... M>
-    // void modify(int ll, int rr, const M&... v) {
-    //     assert(0 <= ll && ll <= rr && rr <= n - 1);
-    //     modify(0, 0, n - 1, ll, rr, v...);
-    // }
-
-void apply(int nd, int a, char const *b, LL c) {
-    cout << nd << " " << a << " " << b << " " << c << endl;
-}
-
-template <typename... M>
-void f(int nd, const M& ...v) {
-    apply(nd, v...);
-}
-
 int main() {
-    f(1, 2, "sdf", 33);
     return 0;
 }

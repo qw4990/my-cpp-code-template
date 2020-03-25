@@ -1,272 +1,128 @@
 #include "defines.h"
 
-/**
- *    author:  tourist
- *    created: 19.03.2020 17:53:32       
-**/
-#include <bits/stdc++.h>
-
-using namespace std;
-
 class segtree {
- public:
-  struct node {
-    int add = 0;
-    int mn = 0;
+public:
+    struct node {
+        int add = 0;
+        int mn = 0;
 
-    void apply(int l, int r, int v) {
-      mn += v;
-      add += v;
+        void apply(int l, int r, int v) {
+            mn += v;
+            add += v;
+        }
+    };
+
+    node unite(const node &a, const node &b) const {
+        node res;
+        res.mn = min(a.mn, b.mn);
+        return res;
     }
-  };
 
-  node unite(const node &a, const node &b) const {
-    node res;
-    res.mn = min(a.mn, b.mn);
-    return res;
-  }
-
-  inline void push(int x, int l, int r) {
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    if (tree[x].add != 0) {
-      tree[x + 1].apply(l, y, tree[x].add);
-      tree[z].apply(y + 1, r, tree[x].add);
-      tree[x].add = 0;
+    inline void push(int x, int l, int r) {
+        if (tree[x].add != 0) {
+            int mid = (l + r) >> 1;
+            tree[lson(x)].apply(l, mid, tree[x].add);
+            tree[rson(x)].apply(mid+1, r, tree[x].add);
+            tree[x].add = 0;
+        }
     }
-  }
 
-  inline void pull(int x, int z) {
-    tree[x] = unite(tree[x + 1], tree[z]);
-  }
-
-  int n;
-  vector<node> tree;
-
-  void build(int x, int l, int r) {
-    if (l == r) {
-      return;
+    inline void pull(int x) {
+        tree[x] = unite(tree[x*2], tree[x*2+1]);
     }
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    build(x + 1, l, y);
-    build(z, y + 1, r);
-    pull(x, z);
-  }
 
-  template <typename M>
-  void build(int x, int l, int r, const vector<M> &v) {
-    if (l == r) {
-      tree[x].apply(l, r, v[l]);
-      return;
-    }
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    build(x + 1, l, y, v);
-    build(z, y + 1, r, v);
-    pull(x, z);
-  }
+    inline int lson(int x) {return x * 2;}
+    inline int rson(int x) {return x * 2 + 1;}
 
-  node get(int x, int l, int r, int ll, int rr) {
-    if (ll <= l && r <= rr) {
-      return tree[x];
-    }
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    push(x, l, r);
-    node res{};
-    if (rr <= y) {
-      res = get(x + 1, l, y, ll, rr);
-    } else {
-      if (ll > y) {
-        res = get(z, y + 1, r, ll, rr);
-      } else {
-        res = unite(get(x + 1, l, y, ll, rr), get(z, y + 1, r, ll, rr));
-      }
-    }
-    pull(x, z);
-    return res;
-  }
+    int n;
+    VEC<node> tree;
 
-  template <typename... M>
-  void modify(int x, int l, int r, int ll, int rr, const M&... v) {
-    if (l == ll && r == rr) {
-      tree[x].apply(l, r, v...);
-      return;
+    void build(int x, int l, int r) {
+        if (l == r) {
+            return;
+        }
+        int mid = (l+r) >> 1;
+        build(lson(x), l, mid);
+        build(rson(x), mid+1, r);
+        pull(x);
     }
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    push(x, l, r);
-    if (ll <= y) {
-      modify(x + 1, l, y, ll, rr, v...);
-    }
-    if (rr > y) {
-      modify(z, y + 1, r, ll, rr, v...);
-    }
-    pull(x, z);
-  }
 
-  int find_first_knowingly(int x, int l, int r, const function<bool(const node&)> &f) {
-    if (l == r) {
-      return l;
+    template <typename M>
+    void build(int x, int l, int r, const VEC<M> &vs) {
+        if (l == r) {
+            tree[x].apply(l, r, vs[l]);
+            return;
+        }
+        int mid = (l+r) >> 1;
+        build(lson(x), l, mid, vs);
+        build(rson(x), mid+1, r, vs);
+        pull(x);
     }
-    push(x, l, r);
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    int res;
-    if (f(tree[x + 1])) {
-      res = find_first_knowingly(x + 1, l, y, f);
-    } else {
-      res = find_first_knowingly(z, y + 1, r, f);
+
+    node get(int x, int l, int r, int ll, int rr) {
+        if (l == ll && r == rr) {
+            return tree[x];
+        }
+        push(x, l, r);
+        int mid = (l+r) >> 1;
+        node res{};
+        if (rr <= mid) {
+            res = get(lson(x), l, mid, ll, rr);
+        } else if (ll > mid) {
+            res = get(rson(x), mid+1, r, ll, rr);
+        } else {
+            res = unite(get(lson(x), l, mid, ll, mid), get(rson(x), mid+1, r, mid+1, rr));
+        }
+        pull(x);
+        return res;
     }
-    pull(x, z);
-    return res;
-  }
 
-  int find_first(int x, int l, int r, int ll, int rr, const function<bool(const node&)> &f) {
-    if (ll <= l && r <= rr) {
-      if (!f(tree[x])) {
-        return -1;
-      }
-      return find_first_knowingly(x, l, r, f);
+    template <typename... M>
+    void modify(int x, int l, int r, int ll, int rr, const M&... v) {
+        if (l == ll && r == rr) {
+            tree[x].apply(l, r, v...);
+            return;
+        }
+        push(x, l, r);
+        int mid = (l + r) >> 1;
+        if (rr <= mid) {
+            modify(lson(x), l, mid, ll, rr, v...);
+        } else if (ll > mid) {
+            modify(rson(x), mid+1, r, ll, rr, v...);
+        } else {
+            modify(lson(x), l, mid, ll, mid, v...);
+            modify(rson(x), mid+1, r, mid+1, rr, v...);
+        }
+        pull(x);
     }
-    push(x, l, r);
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    int res = -1;
-    if (ll <= y) {
-      res = find_first(x + 1, l, y, ll, rr, f);
+
+    segtree(int _n) : n(_n) {
+        tree.resize(4 * n - 1);
+        build(1, 1, n);
     }
-    if (rr > y && res == -1) {
-      res = find_first(z, y + 1, r, ll, rr, f);
+
+    template <typename M>
+    segtree(const vector<M> &v) {
+        n = v.size(); // index starts from 1
+        n--;
+        assert(n >= 1);
+        tree.resize(4 * n - 1);
+        build(1, 1, n, v);
     }
-    pull(x, z);
-    return res;
-  }
 
-  int find_last_knowingly(int x, int l, int r, const function<bool(const node&)> &f) {
-    if (l == r) {
-      return l;
+    node get(int ll, int rr) {
+        assert(0 < ll && ll <= rr && rr <= n);
+        return get(1, 1, n, ll, rr);
     }
-    push(x, l, r);
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    int res;
-    if (f(tree[z])) {
-      res = find_last_knowingly(z, y + 1, r, f);
-    } else {
-      res = find_last_knowingly(x + 1, l, y, f);
+
+    node get(int p) {
+        assert(0 < p && p <= n);
+        return get(1, 1, n, p, p);
     }
-    pull(x, z);
-    return res;
-  }
 
-  int find_last(int x, int l, int r, int ll, int rr, const function<bool(const node&)> &f) {
-    if (ll <= l && r <= rr) {
-      if (!f(tree[x])) {
-        return -1;
-      }
-      return find_last_knowingly(x, l, r, f);
+    template <typename... M>
+    void modify(int ll, int rr, const M&... v) {
+        assert(0 < ll && ll <= rr && rr <= n);
+        modify(1, 1, n, ll, rr, v...);
     }
-    push(x, l, r);
-    int y = (l + r) >> 1;
-    int z = x + ((y - l + 1) << 1);
-    int res = -1;
-    if (rr > y) {
-      res = find_last(z, y + 1, r, ll, rr, f);
-    }
-    if (ll <= y && res == -1) {
-      res = find_last(x + 1, l, y, ll, rr, f);
-    }
-    pull(x, z);
-    return res;
-  }
-
-  segtree(int _n) : n(_n) {
-    assert(n > 0);
-    tree.resize(2 * n - 1);
-    build(0, 0, n - 1);
-  }
-
-  template <typename M>
-  segtree(const vector<M> &v) {
-    n = v.size();
-    assert(n > 0);
-    tree.resize(2 * n - 1);
-    build(0, 0, n - 1, v);
-  }
-
-  node get(int ll, int rr) {
-    assert(0 <= ll && ll <= rr && rr <= n - 1);
-    return get(0, 0, n - 1, ll, rr);
-  }
-
-  node get(int p) {
-    assert(0 <= p && p <= n - 1);
-    return get(0, 0, n - 1, p, p);
-  }
-
-  template <typename... M>
-  void modify(int ll, int rr, const M&... v) {
-    assert(0 <= ll && ll <= rr && rr <= n - 1);
-    modify(0, 0, n - 1, ll, rr, v...);
-  }
-
-  // find_first and find_last call all FALSE elements
-  // to the left (right) of the sought position exactly once
-
-  int find_first(int ll, int rr, const function<bool(const node&)> &f) {
-    assert(0 <= ll && ll <= rr && rr <= n - 1);
-    return find_first(0, 0, n - 1, ll, rr, f);
-  }
-
-  int find_last(int ll, int rr, const function<bool(const node&)> &f) {
-    assert(0 <= ll && ll <= rr && rr <= n - 1);
-    return find_last(0, 0, n - 1, ll, rr, f);
-  }
 };
-
-int main() {
-  ios::sync_with_stdio(false);
-  cin.tie(0);
-  int n;
-  cin >> n;
-  vector<int> p(n);
-  vector<int> pos(n);
-  for (int i = 0; i < n; i++) {
-    cin >> p[i];
-    --p[i];
-    pos[p[i]] = i;
-  }
-  vector<int> q(n);
-  for (int i = 0; i < n; i++) {
-    cin >> q[i];
-    --q[i];
-  }
-  segtree st(n);
-  st.modify(pos[n - 1], n - 1, 1);
-  int ans = n - 1;
-  for (int i = 0; i < n; i++) {
-    if (i > 0) {
-      cout << " ";
-    }
-    cout << ans + 1;
-    if (i == n - 1) {
-      break;
-    }
-    st.modify(q[i], n - 1, -1);
-    while (true) {
-      int mn = min(0, st.get(0, n - 1).mn);
-      int val = st.get(n - 1, n - 1).mn;
-      if (val == mn) {
-        assert(ans > 0);
-        --ans;
-        st.modify(pos[ans], n - 1, 1);
-      } else {
-        break;
-      }
-    }
-  }
-  cout << '\n';
-  return 0;
-}
