@@ -3,18 +3,36 @@
 class segtree {
 public:
     struct node {
+        // min, max, addition, sum
+        int mn, mx, add, sum;
     };
 
     inline void init(int x, int l, int r) {
+        tree[x].mn = 0;
+        tree[x].mx = 0;
+        tree[x].add = 0;
+        tree[x].sum = 0;
     }
 
     inline void apply(int x, int l, int r, int v) {
+        tree[x].mn += v;
+        tree[x].mx += v;
+        tree[x].add += v;
+        tree[x].sum += (r-l+1) * v;
     }
 
     inline void push(int x, int l, int r) {
+        if (tree[x].add != 0) {
+            apply(lson(x), l, r, tree[x].add);
+            apply(rson(x), l, r, tree[x].add);
+            tree[x].add = 0;
+        }
     }
     
     inline void pull_node(node &x, const node &lson, const node &rson) {
+        x.mx = max(lson.mx, rson.mx);
+        x.mn = min(lson.mn, rson.mn);
+        x.sum = lson.sum + rson.sum;
     }
 
     inline void pull(int x) {
