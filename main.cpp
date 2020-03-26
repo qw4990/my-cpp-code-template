@@ -37,5 +37,6 @@ FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
 
 int main() {
+    segtree st(5);
     return 0;
 }

@@ -3,32 +3,19 @@
 class segtree {
 public:
     struct node {
-        int add = 0;
-        int mn = 0;
-
-        void apply(int l, int r, int v) {
-            mn += v;
-            add += v;
-        }
     };
 
-    node unite(const node &a, const node &b) const {
-        node res;
-        res.mn = min(a.mn, b.mn);
-        return res;
+    inline void apply(int x, int l, int r, int v) {
     }
 
-    inline void push(int x, int l, int r) {
-        if (tree[x].add != 0) {
-            int mid = (l + r) >> 1;
-            tree[lson(x)].apply(l, mid, tree[x].add);
-            tree[rson(x)].apply(mid+1, r, tree[x].add);
-            tree[x].add = 0;
-        }
+    inline void push(int x) {
+    }
+    
+    inline void pull_node(node &x, const node &lson, const node &rson) {
     }
 
     inline void pull(int x) {
-        tree[x] = unite(tree[x*2], tree[x*2+1]);
+        pull_node(tree[x], tree[lson(x)], tree[rson(x)]);
     }
 
     inline int lson(int x) {return x * 2;}
@@ -50,7 +37,7 @@ public:
     template <typename M>
     void build(int x, int l, int r, const VEC<M> &vs) {
         if (l == r) {
-            tree[x].apply(l, r, vs[l]);
+            apply(x, l, r, vs[l]);
             return;
         }
         int mid = (l+r) >> 1;
@@ -63,7 +50,7 @@ public:
         if (l == ll && r == rr) {
             return tree[x];
         }
-        push(x, l, r);
+        push(x);
         int mid = (l+r) >> 1;
         node res{};
         if (rr <= mid) {
@@ -71,7 +58,7 @@ public:
         } else if (ll > mid) {
             res = get(rson(x), mid+1, r, ll, rr);
         } else {
-            res = unite(get(lson(x), l, mid, ll, mid), get(rson(x), mid+1, r, mid+1, rr));
+            pull_node(res, get(lson(x), l, mid, ll, mid), get(rson(x), mid+1, r, mid+1, rr));
         }
         pull(x);
         return res;
@@ -80,10 +67,10 @@ public:
     template <typename... M>
     void modify(int x, int l, int r, int ll, int rr, const M&... v) {
         if (l == ll && r == rr) {
-            tree[x].apply(l, r, v...);
+            apply(x, l, r, v...);
             return;
         }
-        push(x, l, r);
+        push(x);
         int mid = (l + r) >> 1;
         if (rr <= mid) {
             modify(lson(x), l, mid, ll, rr, v...);
