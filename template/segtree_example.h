@@ -7,7 +7,7 @@ public:
         int mn, mx, add, sum;
     };
 
-    inline void init(int x, int l, int r) {
+    inline void init(int x, int pos) {
         tree[x].mn = 0;
         tree[x].mx = 0;
         tree[x].add = 0;
@@ -47,7 +47,7 @@ public:
 
     void build(int x, int l, int r) {
         if (l == r) {
-            init(x, l, r);
+            init(x, l);
             return;
         }
         int mid = (l+r) >> 1;
@@ -59,7 +59,7 @@ public:
     template <typename M>
     void build(int x, int l, int r, const VEC<M> &vs) {
         if (l == r) {
-            init(x, l, r);
+            init(x, l);
             apply(x, l, r, vs[l]);
             return;
         }

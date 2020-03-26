@@ -5,7 +5,7 @@ public:
     struct node {
     };
 
-    inline void init(int x, int l, int r) {
+    inline void init(int x, int pos) {
     }
 
     inline void apply(int x, int l, int r, int v) {
@@ -29,7 +29,7 @@ public:
 
     void build(int x, int l, int r) {
         if (l == r) {
-            init(x, l, r);
+            init(x, l);
             return;
         }
         int mid = (l+r) >> 1;
@@ -41,7 +41,7 @@ public:
     template <typename M>
     void build(int x, int l, int r, const VEC<M> &vs) {
         if (l == r) {
-            init(x, l, r);
+            init(x, l);
             apply(x, l, r, vs[l]);
             return;
         }
