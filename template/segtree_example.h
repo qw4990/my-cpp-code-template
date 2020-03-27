@@ -4,7 +4,8 @@ class segtree {
 public:
     struct node {
         // min, max, addition, sum
-        int mn, mx, add, sum;
+        int mn, mx, add;
+        LL sum;
     };
 
     inline void init(int x, int pos) {
@@ -18,7 +19,7 @@ public:
         tree[x].mn += v;
         tree[x].mx += v;
         tree[x].add += v;
-        tree[x].sum += (r-l+1) * v;
+        tree[x].sum += (LL)(r-l+1) * v;
     }
 
     inline void push(int x, int l, int r) {
