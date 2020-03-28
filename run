@@ -1,4 +1,9 @@
-c++ -std=c++14 main.cpp; 
+src=$1
+if [ "$src" = "" ]; then
+    src="main.cpp"
+fi;
+
+c++ -std=c++14 $src; 
 if [ $? -eq 0 ]; then 
     start_time="$(date -u +%s)"
     ./a.out;
