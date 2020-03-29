@@ -9,6 +9,7 @@
 #include <cstring>
 #include <queue>
 #include <stack>
+#include <assert.h>
 #include <deque>
 #include <list>
 #include <math.h>
