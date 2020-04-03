@@ -37,7 +37,16 @@ using namespace std;
 FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
 
+int n;
+VEC<int> as;
+
 int main() {
-    FORCASE() {
-    }
+    cin >> n;
+    INPUT_VEC(as, n)
+    
+    int anw = 0;
+    REP(i, n) REP(j, i)
+        anw ^= (as[i]+as[j]);
+    
+    cout << anw << endl;
 }

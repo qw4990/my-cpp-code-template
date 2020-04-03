@@ -103,5 +103,60 @@ int main() {
 /*
 
 解法 2：
+分开处理每个二进制位 k，设置 bit = (1<<k)。
+按照每个数 a&bit 的结果分为 ones 和 zeros。
+分别处理 zeros 内，zeros 和 ones 之间，ones 内相加后第 k 位为 1 的个数，然后看个数是奇数还是偶数。
+可以先对 ones 和 zeros 排序，就会发现单调性，然后用双指针解决。
 
+int n;
+VEC<int> as, zero, one;
+
+int main() {
+    cin >> n;
+    INPUT_VEC(as, n)
+
+    int anw = 0;
+    REP(k, 26) {
+        zero.clear();
+        one.clear();
+        int mask = (1<<(k+1))-1, bit = (1<<k);
+        FOREACH(a, as) {
+            if (a & bit) {
+                one.push_back(a&mask);
+            } else {
+                zero.push_back(a&mask);
+            }
+        }
+
+        sort(zero.begin(), zero.end());
+        sort(one.begin(), one.end());
+
+        int cnt = 0;
+        int j = zero.size();
+        REP(i, int(zero.size())-1) { // 0&0
+            while (j-1 > i && ((zero[j-1] + zero[i])&bit)) j--;
+            if (j <= i) j++;
+
+            cnt += (zero.size() - j);
+        }
+
+        j = one.size();
+        REP(i, zero.size()) { // 0&1
+            while (j-1 >= 0 && !((one[j-1] + zero[i])&bit)) j--;
+            cnt += j;
+        }
+
+        j = one.size();
+        REP(i, int(one.size())-1) {// 1&1
+            while (j-1 > i && ((one[j-1] + one[i])&bit)) {j--;}
+            if (j <= i) j++;
+            cnt += (one.size() - j);
+        }
+
+        if (cnt & 1) anw += bit;
+    }
+
+    cout << anw << endl;
+    return 0;
+}
 */
