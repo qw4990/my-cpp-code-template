@@ -64,6 +64,7 @@ LL gcd(LL a, LL b) {
 // for example: 2484 = 2 * 2 * 3 * 3 * 3 * 23
 // O(sqrt(x))
 void factoring(LL x, VEC<LL> &factors) {
+    factors.clear();
     LL prim = 2;
     while (prim * prim <= x) {
         while (x % prim == 0) {
@@ -75,11 +76,24 @@ void factoring(LL x, VEC<LL> &factors) {
     if (x != 1) factors.push_back(x);
 }
 
-// IsPrime tests if this number is a prime number.
+// is_prime tests if this number is a prime number.
 // O(sqrt(x))
 bool is_prime(LL x) {
     if (x <= 1) return false;
     for (LL i = 2; i*i <= x; i++) 
         if (x % i == 0) return false;
     return true;
+}
+
+// get_primes get all primes which less or equal than the bound.
+// the bound should not be too large, O(bound).
+int get_primes(int bound, VEC<int> &primes) {
+    primes.clear();
+    VEC<bool> xs;
+    xs.resize(bound+1, true);
+    for (int i = 2; i*i <= bound; i++) 
+        if (!xs[i]) continue;
+        else for (int j = i+i; j <= bound; j+=i) xs[j] = false;
+    FOR(i, 2, bound) if (xs[i]) primes.push_back(i);
+    return primes.size();
 }
