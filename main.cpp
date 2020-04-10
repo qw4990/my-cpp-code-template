@@ -37,6 +37,55 @@ using namespace std;
 FUNCTOR(pii_first, bool, (PII p1, PII p2), {return p1.first < p2.first;})
 FUNCTOR(pii_second, bool, (PII p1, PII p2), {return p1.second < p2.second;})
 
+int n, k;
+VEC<char> ds;
+queue<int> pos;
+VEC<VEC<int>> anws;
+
 int main() {
+    cin >> n >> k;
+    ds.resize(n+1);
+    FOR(i, 1, n) cin >> ds[i];
+
+    int tot = 0, numR = 0;
+    FOR(i, 1, n) {
+        if (ds[i] == 'L') tot += numR;
+        else numR++;
+    }
+
+    if (k > tot) {
+        cout << -1 << endl;
+        return 0;
+    }
+
+    while (!pos.empty()) pos.pop();
+    FOR(i, 1, n-1) 
+        if (ds[i] == 'R' && ds[i+1] == 'L') pos.push(i);
+    REP(i, k) {
+        int t = min(int(pos.size()), tot-(k-i-1));
+        VEC<int> anw;
+        REP(j, t) {
+            int x = pos.front();
+            pos.pop();
+            anw.push_back(x);
+            swap(ds[x], ds[x+1]);
+            if (x-1>=1 && ds[x-1]=='R') pos.push(x-1);
+            if (x+2<=n && ds[x+2]=='L') pos.push(x+1);
+        }
+        anws.push_back(anw);
+        tot-=t;
+    }
+
+    if (tot > 0) {
+        cout << -1 << endl;
+        return 0;
+    }
+
+    REP(i, k) {
+        printf("%d ", int(anws[i].size()));
+        FOREACH(x, anws[i]) printf("%d ", x);
+        printf("\n");
+    }
+
     return 0;
 }
